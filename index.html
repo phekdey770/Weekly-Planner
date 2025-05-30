@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Planner with Reflection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3281/3281289.png">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --font-normal: 'Kantumruy Pro', sans-serif;
+            --font-header: 'Moul', serif;
+            --font-model: 'Moulpali', serif;
+            --transition: all 0.3s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-normal);
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Language Toggle */
+        .language-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 30px;
+            padding: 5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .language-toggle span {
+            padding: 0 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .language-toggle .active {
+            color: var(--primary-color);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .language-toggle input[type="checkbox"]:checked + .toggle-switch::before {
+            transform: translateX(30px);
+        }
+
+        .language-toggle input[type="checkbox"] {
+            display: none;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 999;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        h1 {
+            font-family: var(--font-header);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: var(--primary-color);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            animation: pulse 2s infinite 1s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('https://assets.website-files.com/5e6c01bb5212506d6c119069/5e6ed9ff2472a478a2f0001e_wave-haikei-blue.svg') center/cover no-repeat;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: var(--font-header);
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--primary-color);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .feature-card.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-card:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+
+        .feature-card:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+
+        .feature-card:nth-child(3) {
+            transition-delay: 0.3s;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-family: var(--font-model);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .feature-description {
+            color: #666;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Screenshot Section */
+        .screenshot {
+            padding: 5rem 2rem;
+            background: #f1f3f5;
+        }
+
+        .screenshot-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .screenshot-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .screenshot-image:hover {
+            transform: scale(1.02);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .testimonial-text::before,
+        .testimonial-text::after {
+            content: '"';
+            font-size: 3rem;
+            color: var(--accent-color);
+            opacity: 0.3;
+            position: absolute;
+        }
+
+        .testimonial-text::before {
+            top: -20px;
+            left: -10px;
+        }
+
+        .testimonial-text::after {
+            bottom: -40px;
+            right: -10px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 1rem;
+        }
+
+        .author-info h4 {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .author-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+
+        .pricing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .pricing-card.featured {
+            border: 2px solid var(--primary-color);
+            position: relative;
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pricing-title {
+            font-family: var(--font-model);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-button {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .pricing-button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .pricing-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+        }
+
+        /* Khmer Language Styles */
+        body.khmer .en-text {
+            display: none;
+        }
+
+        body:not(.khmer) .kh-text {
+            display: none;
+        }
+
+        .khmer {
+            font-family: var(--font-normal);
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+        <span class="en-text active">EN</span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="language-toggle">
+            <span class="toggle-switch"></span>
+        </label>
+        <span class="kh-text">ខ្មែរ</span>
+    </div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <img src="https://cdn-icons-png.flaticon.com/512/3281/3281289.png" alt="Weekly Planner Logo" class="logo">
+            <h1 class="en-text">Weekly Planner with Reflection</h1>
+            <h1 class="kh-text">ផែនការសប្តាហ៍ជាមួយការឆ្លុះបញ្ចាំង</h1>
+            <p class="tagline en-text">Organize your week, track your progress, and reflect on your achievements with our beautiful planner</p>
+            <p class="tagline kh-text">រៀបចំសប្តាហ៍របស់អ្នក តាមដានការរីកចម្រើនរបស់អ្នក និងឆ្លុះបញ្ចាំងលើសមិទ្ធផលរបស់អ្នកជាមួយអ្នករៀបចំផែនការដ៏ស្រស់ស្អាតរបស់យើង</p>
+            <a href="#download" class="cta-button en-text">Get Started</a>
+            <a href="#download" class="cta-button kh-text">ចាប់ផ្តើម</a>
+        </div>
+        <div class="header-wave"></div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2 class="section-title en-text">Amazing Features</h2>
+        <h2 class="section-title kh-text">លក្ខណៈពិសេសដ៏អស្ចារ្យ</h2>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3 class="feature-title en-text">Weekly Planning</h3>
+                <h3 class="feature-title kh-text">ការរៀបចំផែនការសប្តាហ៍</h3>
+                <p class="feature-description en-text">Plan your entire week with our intuitive weekly layout that helps you stay organized and focused.</p>
+                <p class="feature-description kh-text">រៀបចំផែនការសប្តាហ៍ទាំងមូលរបស់អ្នកជាមួយនឹងប្លង់សប្តាហ៍ដែលអាចយល់បានដែលជួយអ្នកឱ្យមានរបៀបរៀបចំ និងផ្តោតអារម្មណ៍។</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3 class="feature-title en-text">Daily Reflection</h3>
+                <h3 class="feature-title kh-text">ការឆ្លុះបញ្ចាំងប្រចាំថ្ងៃ</h3>
+                <p class="feature-description en-text">Reflect on your daily achievements, challenges, and lessons learned to promote personal growth.</p>
+                <p class="feature-description kh-text">ឆ្លុះបញ្ចាំងលើសមិទ្ធផល បញ្ហាប្រឈម និងមេរៀនដែលបានរៀនរបស់អ្នកជារៀងរាល់ថ្ងៃដើម្បីលើកកម្ពស់ការលូតលាស់ផ្ទាល់ខ្លួន។</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title en-text">Progress Tracking</h3>
+                <h3 class="feature-title kh-text">ការតាមដានការរីកចម្រើន</h3>
+                <p class="feature-description en-text">Visualize your progress with beautiful charts and statistics to stay motivated and on track.</p>
+                <p class="feature-description kh-text">មើលឃើញការរីកចម្រើនរបស់អ្នកជាមួយនឹងក្រាហ្វិក និងស្ថិតិដ៏ស្រស់ស្អាតដើម្បីឱ្យមានការលើកទឹកចិត្ត និងនៅលើផ្លូវ។</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshot Section -->
+    <section class="screenshot">
+        <div class="screenshot-container">
+            <h2 class="section-title en-text">Beautiful Interface</h2>
+            <h2 class="section-title kh-text">ចំណុចប្រទាក់ដ៏ស្រស់ស្អាត</h2>
+            <img src="https://images.unsplash.com/photo-1676276375900-dd41f828c985?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Planner Screenshot" class="screenshot-image">
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <h2 class="section-title en-text">What Users Say</h2>
+        <h2 class="section-title kh-text">អ្វីដែលអ្នកប្រើប្រាស់និយាយ</h2>
+        
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <p class="testimonial-text en-text">This planner has completely transformed how I organize my week. The reflection feature helps me stay mindful of my progress.</p>
+                <p class="testimonial-text kh-text">អ្នករៀបចំផែនការនេះបានផ្លាស់ប្តូរទាំងស្រុងពីរបៀបដែលខ្ញុំរៀបចំសប្តាហ៍របស់ខ្ញុំ។ លក្ខណៈពិសេសនៃការឆ្លុះបញ្ចាំងជួយខ្ញុំឱ្យនៅដឹងពីការរីកចម្រើនរបស់ខ្ញុំ។</p>
+                <div class="testimonial-author">
+                    <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="User" class="author-avatar">
+                    <div class="author-info">
+                        <h4>Sophia Chen</h4>
+                        <p class="en-text">Marketing Manager</p>
+                        <p class="kh-text">អ្នកគ្រប់គ្រងទីផ្សារ</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card">
+                <p class="testimonial-text en-text">The perfect balance between planning and reflection. I've become more productive and self-aware since using this planner.</p>
+                <p class="testimonial-text kh-text">តុល្យភាពល្អឥតខ្ចោះរវាងការរៀបចំផែនការ និងការឆ្លុះបញ្ចាំង។ ខ្ញុំបានក្លាយជាមានផលិតភាព និងដឹងខ្លួនខ្លាំងឡើងតាំងពីប្រើអ្នករៀបចំផែនការនេះមក។</p>
+                <div class="testimonial-author">
+                    <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="User" class="author-avatar">
+                    <div class="author-info">
+                        <h4>James Wilson</h4>
+                        <p class="en-text">Software Developer</p>
+                        <p class="kh-text">អ្នកអភិវឌ្ឍន៍សូហ្វវែរ</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card">
+                <p class="testimonial-text en-text">Love the Khmer language support! Finally a planner that understands my needs as a Cambodian professional.</p>
+                <p class="testimonial-text kh-text">ចូលចិត្តការគាំទ្រភាសាខ្មែរ! នៅទីបំផុតអ្នករៀបចំផែនការដែលយល់ពីតម្រូវការរបស់ខ្ញុំជាមន្ត្រីជំនាញកម្ពុជា។</p>
+                <div class="testimonial-author">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="author-avatar">
+                    <div class="author-info">
+                        <h4>Sreyneath Lim</h4>
+                        <p class="en-text">Business Owner</p>
+                        <p class="kh-text">ម្ចាស់អាជីវកម្ម</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="download">
+        <div class="pricing-container">
+            <h2 class="section-title en-text">Simple Pricing</h2>
+            <h2 class="section-title kh-text">តម្លៃសាមញ្ញ</h2>
+            
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <h3 class="pricing-title en-text">Basic</h3>
+                    <h3 class="pricing-title kh-text">មូលដ្ឋាន</h3>
+                    <div class="pricing-price">$0</div>
+                    <ul class="pricing-features">
+                        <li class="en-text">Weekly planning</li>
+                        <li class="kh-text">ការរៀបចំផែនការសប្តាហ៍</li>
+                        <li class="en-text">Basic reflection prompts</li>
+                        <li class="kh-text">សំណួរឆ្លុះបញ្ចាំងមូលដ្ឋាន</li>
+                        <li class="en-text">Ad-supported</li>
+                        <li class="kh-text">គាំទ្រដោយផ្នែកពាណិជ្ជកម្ម</li>
+                    </ul>
+                    <a href="#" class="pricing-button en-text">Get Started</a>
+                    <a href="#" class="pricing-button kh-text">ចាប់ផ្តើម</a>
+                </div>
+                
+                <div class="pricing-card featured">
+                    <h3 class="pricing-title en-text">Premium</h3>
+                    <h3 class="pricing-title kh-text">គុណភាពខ្ពស់</h3>
+                    <div class="pricing-price">$4.99</div>
+                    <ul class="pricing-features">
+                        <li class="en-text">Everything in Basic</li>
+                        <li class="kh-text">អ្វីៗទាំងអស់នៅក្នុងមូលដ្ឋាន</li>
+                        <li class="en-text">Advanced reflection tools</li>
+                        <li class="kh-text">ឧបករណ៍ឆ្លុះបញ្ចាំងកម្រិតខ្ពស់</li>
+                        <li class="en-text">Progress analytics</li>
+                        <li class="kh-text">ការវិភាគការរីកចម្រើន</li>
+                        <li class="en-text">No ads</li>
+                        <li class="kh-text">គ្មានផ្នែកពាណិជ្ជកម្ម</li>
+                    </ul>
+                    <a href="#" class="pricing-button en-text">Get Premium</a>
+                    <a href="#" class="pricing-button kh-text">ទទួលបានគុណភាពខ្ពស់</a>
+                </div>
+                
+                <div class="pricing-card">
+                    <h3 class="pricing-title en-text">Team</h3>
+                    <h3 class="pricing-title kh-text">ក្រុម</h3>
+                    <div class="pricing-price">$9.99</div>
+                    <ul class="pricing-features">
+                        <li class="en-text">Everything in Premium</li>
+                        <li class="kh-text">អ្វីៗទាំងអស់នៅក្នុងគុណភាពខ្ពស់</li>
+                        <li class="en-text">Up to 5 team members</li>
+                        <li class="kh-text">រហូតដល់សមាជិកក្រុម ៥ នាក់</li>
+                        <li class="en-text">Shared goals & progress</li>
+                        <li class="kh-text">គោលដៅ និងការរីកចម្រើនរួមគ្នា</li>
+                    </ul>
+                    <a href="#" class="pricing-button en-text">Get Team Plan</a>
+                    <a href="#" class="pricing-button kh-text">ទទួលបានផែនការក្រុម</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <img src="https://cdn-icons-png.flaticon.com/512/3281/3281289.png" alt="Logo" class="footer-logo">
+            
+            <div class="footer-links">
+                <a href="#" class="en-text">Home</a>
+                <a href="#" class="kh-text">ទំព័រដើម</a>
+                <a href="#" class="en-text">Features</a>
+                <a href="#" class="kh-text">លក្ខណៈពិសេស</a>
+                <a href="#" class="en-text">Pricing</a>
+                <a href="#" class="kh-text">តម្លៃ</a>
+                <a href="#" class="en-text">About</a>
+                <a href="#" class="kh-text">អំពី</a>
+                <a href="#" class="en-text">Contact</a>
+                <a href="#" class="kh-text">ទំនាក់ទំនង</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            
+            <p class="copyright en-text">2025 - All rights reserved. Provide by Mr. Phekdey PHORN</p>
+            <p class="copyright kh-text">2025 - រក្សារ​សិទ្ធិ​គ្រប់​យ៉ាង ដោយលោក ផន ភក្ដី។</p>
+        </div>
+    </footer>
+
+    <script>
+        // Language Toggle
+        const languageToggle = document.getElementById('language-toggle');
+        languageToggle.addEventListener('change', function() {
+            document.body.classList.toggle('khmer', this.checked);
+            
+            // Update toggle switch active state
+            const enText = document.querySelector('.language-toggle .en-text');
+            const khText = document.querySelector('.language-toggle .kh-text');
+            
+            if (this.checked) {
+                enText.classList.remove('active');
+                khText.classList.add('active');
+            } else {
+                enText.classList.add('active');
+                khText.classList.remove('active');
+            }
+        });
+
+        // Back to Top Button
+        const backToTopButton = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('active');
+            } else {
+                backToTopButton.classList.remove('active');
+            }
+        });
+
+        backToTopButton.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Animate features on scroll
+        const featureCards = document.querySelectorAll('.feature-card');
+        
+        const animateOnScroll = function() {
+            featureCards.forEach(card => {
+                const cardPosition = card.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+                
+                if (cardPosition < screenPosition) {
+                    card.classList.add('animate');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
